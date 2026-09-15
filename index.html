@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🌱 공기를 지켜라!</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #DDF4FF;
+    color: #123B5A;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+}
+
+#game {
+    width: 900px;
+    max-width: 96vw;
+    min-height: 680px;
+    margin: 0 auto;
+    padding: 18px 20px 24px;
+    text-align: center;
+}
+
+/* 제목 */
+
+h1 {
+    margin: 0 0 3px;
+    font-size: 36px;
+}
+
+.subtitle {
+    margin: 0 0 12px;
+    font-size: 16px;
+}
+
+
+/* =========================
+   대기오염 게이지
+========================= */
+
+.gauge-wrap {
+    margin: 8px auto 10px;
+    width: 500px;
+    max-width: 90%;
+}
+
+.gauge-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.gauge {
+    height: 35px;
+    background: #E8EEF2;
+    border: 2px solid #123B5A;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.gauge-fill {
+    height: 100%;
+    width: 50%;
+    transition: width 0.35s, background 0.35s;
+}
+
+.gauge-text {
+    margin-top: 3px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   캐릭터 영역
+========================= */
+
+.character-box {
+    width: 700px;
+    max-width: 92%;
+    height: 175px;
+
+    margin: 8px auto;
+
+    background: white;
+
+    border: 2px solid #BFE8FA;
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+
+    text-align: left;
+}
+
+
+/* 캐릭터 공간 */
+
+.character-area {
+    width: 200px;
+    height: 165px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* =========================
+   공기 캐릭터
+========================= */
+
+.character {
+    position: relative;
+
+    width: 175px;
+    height: 155px;
+}
+
+
+/* 구름 몸체 */
+
+.cloud {
+    position: absolute;
+
+    left: 35px;
+    top: 35px;
+
+    width: 105px;
+    height: 78px;
+
+    background: #30343B;
+
+    border-radius: 50px;
+}
+
+
+/* 구름 위 둥근 부분 */
+
+.cloud::before,
+.cloud::after {
+    content: "";
+
+    position: absolute;
+
+    background: inherit;
+
+    border-radius: 50%;
+}
+
+.cloud::before {
+    width: 58px;
+    height: 58px;
+
+    left: 12px;
+    top: -20px;
+}
+
+.cloud::after {
+    width: 62px;
+    height: 62px;
+
+    right: 10px;
+    top: -24px;
+}
+
+
+/* 팔 */
+
+.arm {
+    position: absolute;
+
+    width: 34px;
+    height: 9px;
+
+    background: #30343B;
+
+    top: 82px;
+
+    border-radius: 8px;
+}
+
+.arm.left {
+    left: 7px;
+    transform: rotate(145deg);
+}
+
+.arm.right {
+    right: 7px;
+    transform: rotate(35deg);
+}
+
+
+/* 손 */
+
+.hand {
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    background: #30343B;
+
+    border-radius: 50%;
+
+    top: 104px;
+}
+
+.hand.left {
+    left: 0;
+}
+
+.hand.right {
+    right: 0;
+}
+
+
+/* 다리 */
+
+.leg {
+    position: absolute;
+
+    width: 9px;
+    height: 28px;
+
+    background: #30343B;
+
+    top: 105px;
+
+    border-radius: 8px;
+}
+
+.leg.left {
+    left: 68px;
+
+    transform: rotate(15deg);
+}
+
+.leg.right {
+    right: 68px;
+
+    transform: rotate(-15deg);
+}
+
+
+/* 발 */
+
+.foot {
+    position: absolute;
+
+    width: 25px;
+    height: 12px;
+
+    background: #30343B;
+
+    border-radius: 50%;
+
+    top: 130px;
+}
+
+.foot.left {
+    left: 55px;
+}
+
+.foot.right {
+    right: 55px;
+}
+
+
+/* 눈 */
+
+.eye {
+    position: absolute;
+
+    z-index: 3;
+
+    width: 11px;
+    height: 15px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    top: 65px;
+}
+
+.eye.left {
+    left: 65px;
+}
+
+.eye.right {
+    right: 65px;
+}
+
+
+/* 입 */
+
+.mouth {
+    position: absolute;
+
+    z-index: 3;
+
+    width: 30px;
+    height: 15px;
+
+    left: 72px;
+    top: 88px;
+
+    border-bottom: 4px solid white;
+
+    border-radius: 0 0 20px 20px;
+}
+
+
+/* =========================
+   캐릭터 상태
+========================= */
+
+
+/* 보통 상태 */
+
+.character.mid .cloud,
+.character.mid .arm,
+.character.mid .hand,
+.character.mid .leg,
+.character.mid .foot {
+
+    background: #66727C;
+}
+
+
+/* 깨끗한 상태 */
+
+.character.clean .cloud,
+.character.clean .arm,
+.character.clean .hand,
+.character.clean .leg,
+.character.clean .foot {
+
+    background: #82CFF0;
+}
+
+.character.clean .eye {
+    background: #123B5A;
+}
+
+.character.clean .mouth {
+    border-bottom-color: #123B5A;
+}
+
+
+/* 오염 상태 - 슬픈 표정 */
+
+.character.dirty .mouth {
+
+    border-bottom: 0;
+
+    border-top: 4px solid white;
+
+    border-radius: 20px 20px 0 0;
+
+    top: 98px;
+}
+
+
+/* =========================
+   대화
+========================= */
+
+.dialogue {
+
+    flex: 1;
+
+    padding: 8px 20px 8px 0;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    line-height: 1.55;
+
+    white-space: pre-line;
+}
+
+
+/* =========================
+   질문
+========================= */
+
+.question {
+
+    margin: 8px auto;
+
+    font-size: 19px;
+
+    font-weight: bold;
+
+    max-width: 820px;
+}
+
+
+/* =========================
+   버튼
+========================= */
+
+.buttons {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+button {
+
+    width: 650px;
+
+    max-width: 92%;
+
+    min-height: 52px;
+
+    padding: 8px 16px;
+
+    border: 2px solid #123B5A;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #123B5A;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    font-family: "Malgun Gothic", sans-serif;
+
+    cursor: pointer;
+
+    transition: 0.12s;
+
+    white-space: normal;
+
+    line-height: 1.3;
+}
+
+
+/* 마우스를 올렸을 때 */
+
+button:hover {
+
+    background: #BFE8FA;
+
+    transform: scale(1.015);
+
+}
+
+
+/* 클릭할 때 */
+
+button:active {
+
+    transform: scale(0.99);
+
+}
+
+
+/* =========================
+   모바일
+========================= */
+
+@media(max-width:700px) {
+
+    #game {
+
+        min-height: 100vh;
+
+        padding: 12px 8px;
+    }
+
+    h1 {
+
+        font-size: 29px;
+    }
+
+    .character-box {
+
+        height: auto;
+
+        min-height: 210px;
+
+        flex-direction: column;
+
+        padding: 6px;
+    }
+
+    .character-area {
+
+        height: 145px;
+    }
+
+    .dialogue {
+
+        padding: 4px 12px 12px;
+
+        text-align: center;
+
+        font-size: 15px;
+    }
+
+    .question {
+
+        font-size: 16px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div id="game">
+
+
+    <!-- 제목 -->
+
+    <h1>🌱 공기를 지켜라!</h1>
+
+    <p class="subtitle">
+        대기오염을 줄이고 깨끗한 도시를 만들어 보세요!
+    </p>
+
+
+    <!-- 게이지 -->
+
+    <div class="gauge-wrap">
+
+        <div class="gauge-title">
+            대기오염 게이지
+        </div>
+
+        <div class="gauge">
+
+            <div
+                id="gaugeFill"
+                class="gauge-fill">
+            </div>
+
+        </div>
+
+        <div
+            id="gaugeText"
+            class="gauge-text">
+        </div>
+
+    </div>
+
+
+    <!-- 캐릭터 -->
+
+    <div class="character-box">
+
+
+        <div class="character-area">
+
+
+            <div
+                id="character"
+                class="character dirty">
+
+
+                <div class="cloud"></div>
+
+
+                <div class="arm left"></div>
+
+                <div class="arm right"></div>
+
+
+                <div class="hand left"></div>
+
+                <div class="hand right"></div>
+
+
+                <div class="leg left"></div>
+
+                <div class="leg right"></div>
+
+
+                <div class="foot left"></div>
+
+                <div class="foot right"></div>
+
+
+                <div class="eye left"></div>
+
+                <div class="eye right"></div>
+
+
+                <div class="mouth"></div>
+
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="dialogue"
+            class="dialogue">
+        </div>
+
+
+    </div>
+
+
+    <!-- 질문 -->
+
+    <div
+        id="question"
+        class="question">
+    </div>
+
+
+    <!-- 선택지 -->
+
+    <div
+        id="buttons"
+        class="buttons">
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================
+   게임 상태
+========================= */
+
+let pollution = 50;
+
+let stage = 0;
+
+
+/* HTML 요소 */
+
+const dialogue =
+    document.getElementById("dialogue");
+
+const question =
+    document.getElementById("question");
+
+const buttons =
+    document.getElementById("buttons");
+
+const gaugeFill =
+    document.getElementById("gaugeFill");
+
+const gaugeText =
+    document.getElementById("gaugeText");
+
+const character =
+    document.getElementById("character");
+
+
+/* =========================
+   게이지 업데이트
+========================= */
+
+function updateGauge() {
+
+
+    /* 0~100 사이로 제한 */
+
+    pollution =
+        Math.max(
+            0,
+            Math.min(100, pollution)
+        );
+
+
+    /* 게이지 길이 */
+
+    gaugeFill.style.width =
+        pollution + "%";
+
+
+    /* 게이지 색깔 */
+
+    if (pollution >= 70) {
+
+        gaugeFill.style.background =
+            "#E85D5D";
+
+    }
+
+    else if (pollution >= 40) {
+
+        gaugeFill.style.background =
+            "#FFD966";
+
+    }
+
+    else {
+
+        gaugeFill.style.background =
+            "#45B97C";
+    }
+
+
+    /* 숫자 */
+
+    gaugeText.textContent =
+        `현재 대기오염 수준: ${pollution}%`;
+
+
+    /* 캐릭터 상태 */
+
+    if (pollution >= 70) {
+
+        character.className =
+            "character dirty";
+
+    }
+
+    else if (pollution >= 40) {
+
+        character.className =
+            "character mid";
+
+    }
+
+    else {
+
+        character.className =
+            "character clean";
+    }
+
+}
+
+
+/* =========================
+   버튼 삭제
+========================= */
+
+function clearButtons() {
+
+    buttons.innerHTML = "";
+
+}
+
+
+/* =========================
+   버튼 생성
+========================= */
+
+function makeButton(text, action) {
+
+
+    const button =
+        document.createElement("button");
+
+
+    button.innerHTML =
+        text;
+
+
+    button.onclick =
+        action;
+
+
+    buttons.appendChild(button);
+
+}
+
+
+/* =========================
+   다음 단계
+========================= */
+
+function nextStage() {
+
+
+    stage++;
+
+
+    if (stage === 1) {
+
+        stage1();
+
+    }
+
+    else if (stage === 2) {
+
+        stage2();
+
+    }
+
+    else if (stage === 3) {
+
+        stage3();
+
+    }
+
+    else if (stage === 4) {
+
+        stage4();
+
+    }
+
+    else if (stage === 5) {
+
+        stage5();
+
+    }
+
+    else if (stage === 6) {
+
+        ending();
+
+    }
+
+}
+
+
+/* =========================
+   INTRO
+========================= */
+
+function intro() {
+
+
+    stage = 0;
+
+
+    dialogue.textContent =
+        "안녕! 나는 우리가 매일 마시는\n" +
+        "공기를 상징하는 공기 캐릭터야! ☁\n\n" +
+        "지금부터 나와 함께 대기오염 문제를\n" +
+        "해결해 보자!";
+
+
+    question.textContent =
+        "🎮 MISSION : 깨끗한 공기를 되찾아라!";
+
+
+    clearButtons();
+
+
+    makeButton(
+        "🎮 게임 시작!",
+        nextStage
+    );
+
+
+    updateGauge();
+
+}
+
+
+/* =========================
+   LEVEL 1
+========================= */
+
+function stage1() {
+
+
+    dialogue.textContent =
+        "산업화가 빠르게 진행되면서\n" +
+        "공장과 산업시설이 크게 늘어났어.\n\n" +
+        "그렇다면 산업화가 대기오염에\n" +
+        "어떤 영향을 주었을까?";
+
+
+    question.textContent =
+        "🏭 산업화가 진행되면서 나타난 변화는?";
+
+
+    clearButtons();
+
+
+    makeButton(
+        "공장과 산업시설이 증가했다",
+        stage1Good
+    );
+
+
+    makeButton(
+        "대기오염이 완전히 사라졌다",
+        stage1Bad
+    );
+
+}
+
+
+/* LEVEL 1 정답 */
+
+function stage1Good() {
+
+
+    dialogue.textContent =
+        "맞아! 🌱\n" +
+        "산업화가 진행되면서 공장과 산업시설이\n" +
+        "증가했고 화석연료 사용도 늘어났어.\n\n" +
+        "이 때문에 대기오염물질 배출도 증가했지.";
+
+
+    nextButton();
+
+}
+
+
+/* LEVEL 1 오답 */
+
+function stage1Bad() {
+
+
+    pollution += 10;
+
+
+    dialogue.textContent =
+        "아쉽지만 아니야!\n" +
+        "산업화가 진행되면서 공장과 산업시설,\n" +
+        "화석연료 사용이 증가했어.\n\n" +
+        "대기오염 문제도 함께 커졌지.";
+
+
+    updateGauge();
+
+
+    nextButton();
+
+}
+
+
+/* =========================
+   LEVEL 2
+========================= */
+
+function stage2() {
+
+
+    dialogue.textContent =
+        "특히 우리나라에서는 경제성장과\n" +
+        "산업화를 빠르게 추진하는 정책들이 시행됐어.\n\n" +
+        "어떤 정책들이 있었을까?";
+
+
+    question.textContent =
+        "📈 대기오염을 가속시킨 산업화 정책은?";
+
+
+    clearButtons();
+
+
+    /* 긴 문장을 2줄로 표시 */
+
+    makeButton(
+        "경제개발 5개년 계획<br>" +
+        "+ 중화학공업 육성 정책",
+        stage2Good
+    );
+
+
+    makeButton(
+        "전 국민 나무 심기 정책",
+        stage2Bad
+    );
+
+}
+
+
+/* LEVEL 2 정답 */
+
+function stage2Good() {
+
+
+    dialogue.textContent =
+        "정답이야! 🌱\n\n" +
+        "경제개발 5개년 계획과 중화학공업 육성 정책은\n" +
+        "우리나라의 산업화를 빠르게 진행시켰어.\n" +
+        "하지만 급격한 산업 확대는 대기오염을\n" +
+        "심화시키는 요인이 되기도 했어.";
+
+
+    nextButton();
+
+}
+
+
+/* LEVEL 2 오답 */
+
+function stage2Bad() {
+
+
+    pollution += 10;
+
+
+    dialogue.textContent =
+        "다시 생각해 봐!\n\n" +
+        "경제성장과 산업화를 우선한\n" +
+        "경제개발 5개년 계획과 중화학공업 육성 정책이\n" +
+        "산업화를 빠르게 진행시켰어.";
+
+
+    updateGauge();
+
+
+    nextButton();
+
+}
+
+
+/* =========================
+   LEVEL 3
+========================= */
+
+function stage3() {
+
+
+    dialogue.textContent =
+        "이렇게 발생한 대기오염은\n" +
+        "우리 생활에도 영향을 줘.\n\n" +
+        "대기오염의 영향을 골라 봐!";
+
+
+    question.textContent =
+        "😷 대기오염이 일으킬 수 있는 문제는?";
+
+
+    clearButtons();
+
+
+    makeButton(
+        "호흡기 건강 악화",
+        stage3Good
+    );
+
+
+    makeButton(
+        "미세먼지로 인한 건강 악화",
+        stage3Good
+    );
+
+
+    makeButton(
+        "기후변화 악화",
+        stage3Good
+    );
+
+}
+
+
+/* LEVEL 3 정답 */
+
+function stage3Good() {
+
+
+    dialogue.textContent =
+        "맞아! 🌱\n\n" +
+        "대기오염은 단순히 공기가 더러워지는\n" +
+        "문제가 아니야.\n" +
+        "호흡기 건강과 생활환경에 영향을 주고\n" +
+        "기후변화 악화에도 영향을 줄 수 있어.";
+
+
+    nextButton();
+
+}
+
+
+/* =========================
+   LEVEL 4
+========================= */
+
+function stage4() {
+
+
+    dialogue.textContent =
+        "다행히 대기오염을 줄이기 위해\n" +
+        "정부와 기업도 여러 노력을 하고 있어.\n\n" +
+        "어떤 방법이 효과적일까?";
+
+
+    question.textContent =
+        "🌱 대기오염을 줄이기 위한 방법은?";
+
+
+    clearButtons();
+
+
+    makeButton(
+        "대기환경보전법 및 배출 규제 강화",
+        stage4Good
+    );
+
+
+    makeButton(
+        "친환경 산업으로 전환",
+        stage4Good
+    );
+
+
+    makeButton(
+        "오염물질 배출을 그대로 유지",
+        stage4Bad
+    );
+
+}
+
+
+/* LEVEL 4 정답 */
+
+function stage4Good() {
+
+
+    pollution -= 10;
+
+
+    dialogue.textContent =
+        "좋은 선택이야! 🌱\n\n" +
+        "정부와 기업의 환경정책과 배출 규제,\n" +
+        "친환경 산업으로의 전환은\n" +
+        "대기오염을 줄이는 데 도움이 될 수 있어.";
+
+
+    updateGauge();
+
+
+    nextButton();
+
+}
+
+
+/* LEVEL 4 오답 */
+
+function stage4Bad() {
+
+
+    pollution += 15;
+
+
+    dialogue.textContent =
+        "이 선택은 대기오염을 줄이는 데\n" +
+        "도움이 되지 않아.\n\n" +
+        "오염물질 배출을 줄이기 위한\n" +
+        "적극적인 노력이 필요해!";
+
+
+    updateGauge();
+
+
+    nextButton();
+
+}
+
+
+/* =========================
+   LEVEL 5
+========================= */
+
+function stage5() {
+
+
+    dialogue.textContent =
+        "정부와 기업뿐만 아니라\n" +
+        "우리도 할 수 있는 일이 있어!\n\n" +
+        "작은 실천을 선택해 봐.";
+
+
+    question.textContent =
+        "🌳 대기오염을 줄이기 위해 우리가 할 수 있는 행동은?";
+
+
+    clearButtons();
+
+
+    makeButton(
+        "🚌 대중교통 이용하기",
+        actionGood
+    );
+
+
+    makeButton(
+        "💡 에너지 절약하기",
+        actionGood
+    );
+
+
+    makeButton(
+        "♻️ 친환경 제품 사용하기",
+        actionGood
+    );
+
+
+    makeButton(
+        "🌳 나무 심고 환경 보호하기",
+        actionGood
+    );
+
+}
+
+
+/* 실천 */
+
+function actionGood() {
+
+
+    pollution -= 10;
+
+
+    dialogue.textContent =
+        "좋아! 🌱\n\n" +
+        "이런 작은 실천들이 모이면\n" +
+        "대기오염을 줄이는 데 도움이 될 수 있어.\n\n" +
+        "이제 마지막 단계야!";
+
+
+    updateGauge();
+
+
+    nextButton();
+
+}
+
+
+/* =========================
+   다음 버튼
+========================= */
+
+function nextButton() {
+
+
+    clearButtons();
+
+
+    makeButton(
+        "➡️ 다음 단계",
+        nextStage
+    );
+
+}
+
+
+/* =========================
+   ENDING
+========================= */
+
+function ending() {
+
+
+    dialogue.textContent =
+        "🎉 MISSION CLEAR!\n\n" +
+        "대기오염은 예방하고 줄여 나갈 수 있어.\n" +
+        "깨끗한 공기는 모두가 누려야 할 권리야.\n\n" +
+        "정부와 기업의 노력뿐만 아니라\n" +
+        "우리 모두의 관심과 실천이 필요해!";
+
+
+    question.textContent =
+        "🌏 깨끗한 미래를 위해 지금부터 함께 행동해요!";
+
+
+    clearButtons();
+
+
+    makeButton(
+        "🔄 다시 플레이",
+        restart
+    );
+
+
+    makeButton(
+        "❌ 게임 종료",
+        function() {
+
+            alert(
+                "게임을 종료하려면\n" +
+                "브라우저 탭을 닫아 주세요."
+            );
+
+        }
+    );
+
+
+    updateGauge();
+
+}
+
+
+/* =========================
+   다시 시작
+========================= */
+
+function restart() {
+
+
+    pollution = 50;
+
+    stage = 0;
+
+
+    intro();
+
+}
+
+
+/* =========================
+   게임 시작
+========================= */
+
+intro();
+
+
+</script>
+
+</body>
+</html>
